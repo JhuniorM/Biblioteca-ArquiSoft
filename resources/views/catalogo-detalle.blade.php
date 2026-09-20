@@ -20,6 +20,11 @@
                     <p>ISBN: <span class="font-semibold text-[#302b26]">{{ $libro->isbn ?? 'No registrado' }}</span></p>
                     <p class="mt-3">Disponibilidad: <span class="font-semibold {{ $libro->ejemplares_disponibles > 0 ? 'text-emerald-700' : 'text-rose-700' }}">{{ $libro->ejemplares_disponibles > 0 ? 'Disponible' : 'Agotado' }}</span></p>
                 </div>
+                @if ($libro->ejemplares_disponibles > 0)
+                    <a href="{{ route('pagos.create', $libro) }}" class="mt-8 inline-flex rounded-full bg-[#24211f] px-7 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#bd9360]">Alquilar ahora &rarr;</a>
+                @else
+                    <span class="mt-8 inline-flex rounded-full bg-[#d8cec2] px-7 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#716960]">Sin disponibilidad</span>
+                @endif
             </div>
         </div>
     </main>
