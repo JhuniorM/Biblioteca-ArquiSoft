@@ -8,9 +8,9 @@
 </head>
 <body class="min-h-screen bg-[#f8f3eb] font-sans text-[#27231f] antialiased">
     <header class="bg-[#151311] text-[#f9f4ec]">
-        <div class="mx-auto flex h-[72px] max-w-[1440px] items-center gap-8 px-6 lg:px-16">
-            <a href="{{ url('/') }}" class="shrink-0 font-display text-xl tracking-wide text-[#e1bd7c]">Biblioteca ArquiSoft</a>
-            <nav class="hidden flex-1 items-center justify-center gap-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d7d0c7] lg:flex">
+        <div class="mx-auto flex min-h-[68px] max-w-[1600px] items-center gap-3 px-4 sm:px-6 xl:gap-7 xl:px-10 2xl:px-16">
+            <a href="{{ url('/') }}" class="shrink-0 font-display text-lg tracking-wide text-[#e1bd7c] sm:text-xl">Biblioteca ArquiSoft</a>
+            <nav class="hidden flex-1 items-center justify-center gap-4 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#d7d0c7] xl:flex 2xl:gap-6">
                 <a href="{{ url('/') }}" class="transition hover:text-[#e1bd7c]">Inicio</a>
                 <a href="{{ route('catalogo.index') }}" class="border-b-2 border-[#d2a45e] pb-2 text-[#e1bd7c]">Cat&aacute;logo</a>
                 <a href="{{ route('categorias.index') }}" class="transition hover:text-[#e1bd7c]">Categor&iacute;as</a>
@@ -19,7 +19,7 @@
                 <a href="{{ route('seccion', 'nosotros') }}" class="transition hover:text-[#e1bd7c]">Nosotros</a>
                 <a href="{{ route('seccion', 'contacto') }}" class="transition hover:text-[#e1bd7c]">Contacto</a>
             </nav>
-            <form action="{{ url()->current() }}" method="GET" class="ml-auto flex w-full max-w-[235px] items-center rounded-full bg-[#fbf8f3] px-3 py-2 text-[#777069]">
+            <form action="{{ url()->current() }}" method="GET" class="ml-auto hidden w-full max-w-[235px] items-center rounded-full bg-[#fbf8f3] px-3 py-2 text-[#777069] md:flex">
                 <svg class="mr-2 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
                 <input name="titulo" value="{{ $titulo }}" type="search" placeholder="Buscar libros, autores..." class="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-[#928a82]">
                 <input type="hidden" name="autor" value="{{ $autor }}">
@@ -27,7 +27,8 @@
                 <input type="hidden" name="disponibilidad" value="{{ $disponibilidad }}">
                 @if ($titulo)<a href="{{ url()->current() }}" aria-label="Limpiar b&uacute;squeda" class="ml-2 text-base leading-none text-[#a39b92]">&times;</a>@endif
             </form>
-            <div class="hidden items-center gap-4 text-[#d7d0c7] sm:flex"><span aria-label="Favoritos" class="text-lg">&#9825;</span><span aria-label="Carrito" class="relative text-lg">&#9822;<sup class="absolute -right-2 -top-1 text-[9px] text-[#e1bd7c]">0</sup></span></div>
+            <details class="relative xl:hidden"><summary class="cursor-pointer list-none rounded-full border border-[#6e5940] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#e1bd7c]">Menú</summary><div class="absolute right-0 top-12 z-20 w-56 rounded-xl bg-[#24211f] p-4 shadow-xl"><a href="{{ url('/') }}" class="block border-b border-white/10 py-2 text-xs">Inicio</a><a href="{{ route('categorias.index') }}" class="block border-b border-white/10 py-2 text-xs">Categorías</a><a href="{{ route('seccion', 'como-funciona') }}" class="block border-b border-white/10 py-2 text-xs">Cómo funciona</a><a href="{{ route('login') }}" class="block py-2 text-xs">Ingresar</a></div></details>
+            <div class="hidden items-center gap-4 text-[#d7d0c7] lg:flex"><span aria-label="Favoritos" class="text-lg">&#9825;</span><span aria-label="Carrito" class="relative text-lg">&#9822;<sup class="absolute -right-2 -top-1 text-[9px] text-[#e1bd7c]">0</sup></span></div>
         </div>
     </header>
 
@@ -41,30 +42,30 @@
                 </div>
                 <p class="hidden max-w-[180px] font-display text-2xl leading-tight text-[#8c847c] lg:block">&ldquo;Un libro siempre es una buena idea.&rdquo;</p>
             </div>
-            <div class="absolute bottom-[-23px] left-1/2 flex -translate-x-1/2 items-center rounded-full bg-[#ede9e5] p-1 shadow-[0_10px_28px_rgba(55,43,31,0.12)]">
-                <a href="#libros" class="rounded-full bg-[#24211f] px-6 py-3 text-center text-[11px] font-medium text-white shadow-sm">&#128214; Libros de lectura<span class="block text-[8px] text-[#c8c0b8]">Ebooks y libros f&iacute;sicos</span></a>
-                <a href="#audiolibros" class="px-6 py-2 text-center text-[11px] font-medium text-[#726b64]">&#127911; Audiolibros<span class="block text-[8px]">Escucha donde quieras</span></a>
-                <a href="#favoritos" class="hidden px-6 py-2 text-center text-[11px] font-medium text-[#726b64] sm:block">&#9825; Favoritos<span class="block text-[8px]">Tus libros guardados</span></a>
+            <div class="absolute bottom-[-23px] left-1/2 flex max-w-[calc(100%-2rem)] -translate-x-1/2 items-center overflow-x-auto rounded-full bg-[#ede9e5] p-1 shadow-[0_10px_28px_rgba(55,43,31,0.12)]">
+                <a href="#libros" class="shrink-0 rounded-full bg-[#24211f] px-5 py-3 text-center text-[10px] font-medium text-white shadow-sm sm:px-6 sm:text-[11px]">&#128214; Libros de lectura<span class="block text-[8px] text-[#c8c0b8]">Ebooks y libros f&iacute;sicos</span></a>
+                <a href="#audiolibros" class="shrink-0 px-5 py-2 text-center text-[10px] font-medium text-[#726b64] sm:px-6 sm:text-[11px]">&#127911; Audiolibros<span class="block text-[8px]">Escucha donde quieras</span></a>
+                <a href="#favoritos" class="hidden shrink-0 px-6 py-2 text-center text-[11px] font-medium text-[#726b64] sm:block">&#9825; Favoritos<span class="block text-[8px]">Tus libros guardados</span></a>
             </div>
         </section>
 
         <section id="libros" class="mx-auto max-w-[1440px] px-6 pb-16 pt-20 lg:px-12">
-            <div id="categorias" class="mb-8 flex flex-wrap items-end justify-between gap-5">
+            <div id="categorias" class="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div><h2 class="font-display text-3xl text-[#302b26]">Libros de lectura <span class="text-xl">&rsaquo;</span></h2><p class="mt-2 text-xs text-[#8b8178]">{{ $libros->total() }} historias en nuestra colecci&oacute;n</p></div>
-                <form action="{{ url()->current() }}" method="GET" class="flex flex-wrap items-center justify-end gap-2">
+                <form action="{{ url()->current() }}" method="GET" class="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_auto] lg:max-w-[690px]">
                     <input type="hidden" name="titulo" value="{{ $titulo }}">
                     <label for="autor" class="sr-only">Filtrar por autor</label>
-                    <input id="autor" name="autor" value="{{ $autor }}" type="search" placeholder="Autor" class="w-32 rounded-full border border-[#ded3c6] bg-transparent px-4 py-2 text-xs text-[#6d645b] outline-none placeholder:text-[#9b9086] focus:border-[#bd9360]">
+                    <input id="autor" name="autor" value="{{ $autor }}" type="search" placeholder="Autor" class="min-w-0 rounded-full border border-[#ded3c6] bg-transparent px-4 py-2 text-xs text-[#6d645b] outline-none placeholder:text-[#9b9086] focus:border-[#bd9360]">
                     <label for="categoria_id" class="sr-only">Filtrar por categor&iacute;a</label>
-                    <select id="categoria_id" name="categoria_id" class="rounded-full border border-[#ded3c6] bg-transparent px-4 py-2 text-xs text-[#6d645b] outline-none focus:border-[#bd9360]"><option value="">Todas las categor&iacute;as</option>@foreach ($categorias as $categoria)<option value="{{ $categoria->id }}" @selected((string) $categoriaId === (string) $categoria->id)>{{ $categoria->nombre }}</option>@endforeach</select>
+                    <select id="categoria_id" name="categoria_id" class="min-w-0 rounded-full border border-[#ded3c6] bg-transparent px-4 py-2 text-xs text-[#6d645b] outline-none focus:border-[#bd9360]"><option value="">Todas las categor&iacute;as</option>@foreach ($categorias as $categoria)<option value="{{ $categoria->id }}" @selected((string) $categoriaId === (string) $categoria->id)>{{ $categoria->nombre }}</option>@endforeach</select>
                     <label for="disponibilidad" class="sr-only">Filtrar por disponibilidad</label>
-                    <select id="disponibilidad" name="disponibilidad" class="rounded-full border border-[#ded3c6] bg-transparent px-4 py-2 text-xs text-[#6d645b] outline-none focus:border-[#bd9360]"><option value="">Disponibilidad</option><option value="disponible" @selected($disponibilidad === 'disponible')>Disponible</option><option value="agotado" @selected($disponibilidad === 'agotado')>Agotado</option></select>
+                    <select id="disponibilidad" name="disponibilidad" class="min-w-0 rounded-full border border-[#ded3c6] bg-transparent px-4 py-2 text-xs text-[#6d645b] outline-none focus:border-[#bd9360]"><option value="">Disponibilidad</option><option value="disponible" @selected($disponibilidad === 'disponible')>Disponible</option><option value="agotado" @selected($disponibilidad === 'agotado')>Agotado</option></select>
                     <button type="submit" class="rounded-full bg-[#24211f] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#bd9360]">Filtrar</button>
                 </form>
             </div>
 
             @if ($libros->isNotEmpty())
-                <div class="grid grid-cols-2 gap-x-5 gap-y-12 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+                <div class="grid grid-cols-1 gap-x-5 gap-y-10 min-[420px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
                     @foreach ($libros as $libro)
                         @php
                             $disponibles = (int) $libro->ejemplares_disponibles;

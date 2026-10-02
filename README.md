@@ -7,6 +7,46 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+# Biblioteca ArquiSoft
+
+Sistema web para gestionar el catálogo, préstamos, devoluciones y multas de la biblioteca.
+
+## Procesos implementados
+
+- Consulta y búsqueda de libros por título, autor, categoría y disponibilidad.
+- Registro transaccional de préstamos con control de ejemplares y vencimiento de 15 días.
+- Devolución autorizada para bibliotecarios y administradores.
+- Cálculo configurable de multa por atraso (`BIBLIOTECA_MULTA_POR_DIA_CENTAVOS`).
+- Inicio de sesión, roles (`estudiante`, `bibliotecario`, `cajero`, `administrador`) y consulta/pago de multas.
+- Pago demo de alquiler con referencia trazable.
+
+## Arquitectura
+
+La presentación usa Blade y Tailwind/Vite. Las rutas delegan en controladores; las reglas transaccionales de circulación viven en `app/Services/PrestamoService.php`; Eloquent representa libros, usuarios, préstamos, pagos y multas; las migraciones mantienen la consistencia de inventario y estados.
+
+## Puesta en marcha
+
+```sh
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm install
+npm run build
+php artisan serve
+```
+
+## Credenciales demo
+
+Después de ejecutar `php artisan migrate --seed`, se crean estas cuentas para probar los permisos:
+
+| Perfil | Correo | Contraseña | Accesos principales |
+| --- | --- | --- | --- |
+| Administrador | `admin@arquisoft.test` | `admin12345` | Devoluciones y control general. |
+| Bibliotecario | `bibliotecario@arquisoft.test` | `biblio12345` | Registro y gestión de devoluciones. |
+
+Estas credenciales son solo para desarrollo local. En producción deben cambiarse o eliminarse.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

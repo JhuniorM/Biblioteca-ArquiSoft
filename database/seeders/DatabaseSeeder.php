@@ -18,8 +18,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Administrador ArquiSoft',
+            'email' => 'admin@arquisoft.test',
+            'password' => 'admin12345',
+            'role' => 'administrador',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Bibliotecario ArquiSoft',
+            'email' => 'bibliotecario@arquisoft.test',
+            'password' => 'biblio12345',
+            'role' => 'bibliotecario',
         ]);
 
         $categorias = collect([

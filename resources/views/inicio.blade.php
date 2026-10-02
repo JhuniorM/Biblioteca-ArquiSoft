@@ -19,7 +19,15 @@
                 <a href="{{ route('seccion', 'nosotros') }}" class="transition hover:text-[#e1bd7c]">Nosotros</a>
                 <a href="{{ route('seccion', 'contacto') }}" class="transition hover:text-[#e1bd7c]">Contacto</a>
             </nav>
-            <a href="{{ route('catalogo.index') }}" class="ml-auto rounded-full border border-[#d2a45e] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e1bd7c] transition hover:bg-[#d2a45e] hover:text-[#151311]">Explorar</a>
+            <div class="ml-auto flex items-center gap-3">
+                @auth
+                    <a href="{{ route('prestamos.index') }}" class="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] transition hover:text-[#e1bd7c]">Mis préstamos</a>
+                    <form action="{{ route('logout') }}" method="POST">@csrf<button class="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] transition hover:text-[#e1bd7c]">Salir</button></form>
+                @else
+                    <a href="{{ route('login') }}" class="rounded-full border border-[#d2a45e] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e1bd7c] transition hover:bg-[#d2a45e] hover:text-[#151311]">Ingresar</a>
+                @endauth
+                <a href="{{ route('catalogo.index') }}" class="rounded-full border border-[#d2a45e] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e1bd7c] transition hover:bg-[#d2a45e] hover:text-[#151311]">Explorar</a>
+            </div>
         </div>
     </header>
 
