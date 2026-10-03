@@ -18,6 +18,13 @@
                 <a href="{{ route('seccion', 'suscripciones') }}" class="transition hover:text-[#e1bd7c]">Suscripciones</a>
                 <a href="{{ route('seccion', 'nosotros') }}" class="transition hover:text-[#e1bd7c]">Nosotros</a>
                 <a href="{{ route('seccion', 'contacto') }}" class="transition hover:text-[#e1bd7c]">Contacto</a>
+                @auth
+                    @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))
+                        <a href="{{ route('prestamos.todos') }}" class="transition hover:text-[#e1bd7c]">Pr&eacute;stamos</a>
+                        <a href="{{ route('prestamos.clientes') }}" class="transition hover:text-[#e1bd7c]">Clientes</a>
+                    @endif
+                    <a href="{{ route('prestamos.index') }}" class="transition hover:text-[#e1bd7c]">Mis pr&eacute;stamos</a>
+                @endauth
             </nav>
             <form action="{{ url()->current() }}" method="GET" class="ml-auto hidden w-full max-w-[235px] items-center rounded-full bg-[#fbf8f3] px-3 py-2 text-[#777069] md:flex">
                 <svg class="mr-2 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
@@ -27,25 +34,22 @@
                 <input type="hidden" name="disponibilidad" value="{{ $disponibilidad }}">
                 @if ($titulo)<a href="{{ url()->current() }}" aria-label="Limpiar b&uacute;squeda" class="ml-2 text-base leading-none text-[#a39b92]">&times;</a>@endif
             </form>
-            <details class="relative xl:hidden"><summary class="cursor-pointer list-none rounded-full border border-[#6e5940] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#e1bd7c]">Menú</summary><div class="absolute right-0 top-12 z-20 w-56 rounded-xl bg-[#24211f] p-4 shadow-xl"><a href="{{ url('/') }}" class="block border-b border-white/10 py-2 text-xs">Inicio</a><a href="{{ route('categorias.index') }}" class="block border-b border-white/10 py-2 text-xs">Categorías</a><a href="{{ route('seccion', 'como-funciona') }}" class="block border-b border-white/10 py-2 text-xs">Cómo funciona</a><a href="{{ route('login') }}" class="block py-2 text-xs">Ingresar</a></div></details>
-            <div class="hidden items-center gap-4 text-[#d7d0c7] lg:flex"><span aria-label="Favoritos" class="text-lg">&#9825;</span><span aria-label="Carrito" class="relative text-lg">&#9822;<sup class="absolute -right-2 -top-1 text-[9px] text-[#e1bd7c]">0</sup></span></div>
+            <details class="relative xl:hidden"><summary class="cursor-pointer list-none rounded-full border border-[#6e5940] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#e1bd7c]">Menú</summary><div class="absolute right-0 top-12 z-20 w-56 rounded-xl bg-[#24211f] p-4 shadow-xl"><a href="{{ url('/') }}" class="block border-b border-white/10 py-2 text-xs">Inicio</a><a href="{{ route('categorias.index') }}" class="block border-b border-white/10 py-2 text-xs">Categorías</a><a href="{{ route('seccion', 'como-funciona') }}" class="block border-b border-white/10 py-2 text-xs">Cómo funciona</a>@auth @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))<a href="{{ route('prestamos.todos') }}" class="block border-b border-white/10 py-2 text-xs">Préstamos</a><a href="{{ route('prestamos.clientes') }}" class="block border-b border-white/10 py-2 text-xs">Clientes</a>@endif<a href="{{ route('prestamos.index') }}" class="block border-b border-white/10 py-2 text-xs">Mis préstamos</a><form action="{{ route('logout') }}" method="POST" class="py-2">@csrf<button type="submit" class="text-xs">Salir</button></form>@else<a href="{{ route('login') }}" class="block py-2 text-xs">Ingresar</a>@endauth</div></details>
         </div>
     </header>
 
     <main>
-        <section class="relative overflow-hidden border-b border-[#ebe1d4] bg-[#fbf8f3]">
+        <section class="relative overflow-visible border-b border-[#ebe1d4] bg-[#fbf8f3]">
             <div class="mx-auto flex min-h-[290px] max-w-[1440px] items-center justify-between gap-8 px-6 py-14 lg:px-16">
                 <div>
                     <p class="mb-4 text-[10px] font-semibold uppercase tracking-[0.35em] text-[#bd9360]">Un mundo de historias</p>
                     <h1 class="font-display text-5xl leading-[1.02] text-[#302b26] sm:text-6xl">Cat&aacute;logo de libros</h1>
-                    <p class="mt-5 max-w-xl text-sm text-[#716960]">Explora nuestra colecci&oacute;n de libros y audiolibros. Grandes historias siempre a tu alcance.</p>
+                    <p class="mt-5 max-w-xl text-sm text-[#716960]">Explora nuestra colecci&oacute;n de libros. Grandes historias siempre a tu alcance.</p>
                 </div>
                 <p class="hidden max-w-[180px] font-display text-2xl leading-tight text-[#8c847c] lg:block">&ldquo;Un libro siempre es una buena idea.&rdquo;</p>
             </div>
-            <div class="absolute bottom-[-23px] left-1/2 flex max-w-[calc(100%-2rem)] -translate-x-1/2 items-center overflow-x-auto rounded-full bg-[#ede9e5] p-1 shadow-[0_10px_28px_rgba(55,43,31,0.12)]">
+            <div class="absolute bottom-[-23px] left-1/2 z-10 flex max-w-[calc(100%-2rem)] -translate-x-1/2 items-center overflow-x-auto rounded-full bg-[#ede9e5] p-1 shadow-[0_10px_28px_rgba(55,43,31,0.12)]">
                 <a href="#libros" class="shrink-0 rounded-full bg-[#24211f] px-5 py-3 text-center text-[10px] font-medium text-white shadow-sm sm:px-6 sm:text-[11px]">&#128214; Libros de lectura<span class="block text-[8px] text-[#c8c0b8]">Ebooks y libros f&iacute;sicos</span></a>
-                <a href="#audiolibros" class="shrink-0 px-5 py-2 text-center text-[10px] font-medium text-[#726b64] sm:px-6 sm:text-[11px]">&#127911; Audiolibros<span class="block text-[8px]">Escucha donde quieras</span></a>
-                <a href="#favoritos" class="hidden shrink-0 px-6 py-2 text-center text-[11px] font-medium text-[#726b64] sm:block">&#9825; Favoritos<span class="block text-[8px]">Tus libros guardados</span></a>
             </div>
         </section>
 

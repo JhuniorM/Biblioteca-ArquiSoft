@@ -50,11 +50,11 @@ class PrestamoService
         });
     }
 
-    public function devolver(Prestamo $prestamo, ?CarbonInterface $fecha = null): Prestamo
+    public function devolver(Prestamo $prestamo, ?CarbonInterface $fecha = null, ?User $usuarioDevolucion = null): Prestamo
     {
         $fecha = $fecha ?: now();
 
-        return $this->database->transaction(function () use ($prestamo, $fecha) {
+        return $this->database->transaction(function () use ($prestamo, $fecha, $usuarioDevolucion) {
             $prestamo = Prestamo::query()->lockForUpdate()->findOrFail($prestamo->id);
 
             if ($prestamo->estado !== 'activo') {
@@ -68,6 +68,7 @@ class PrestamoService
 
             $prestamo->update([
                 'fecha_devolucion' => $fecha->toDateString(),
+                'devuelto_por_user_id' => $usuarioDevolucion?->id,
                 'estado' => 'devuelto',
             ]);
 

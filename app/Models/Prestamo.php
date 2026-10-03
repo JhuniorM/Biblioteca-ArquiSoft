@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Prestamo extends Model
 {
-    protected $fillable = ['libro_id', 'user_id', 'fecha_prestamo', 'fecha_vencimiento', 'fecha_devolucion', 'estado'];
+    protected $fillable = ['libro_id', 'user_id', 'fecha_prestamo', 'fecha_vencimiento', 'fecha_devolucion', 'devuelto_por_user_id', 'estado'];
 
     protected function casts(): array
     {
@@ -27,6 +27,11 @@ class Prestamo extends Model
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function devueltoPor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'devuelto_por_user_id');
     }
 
     public function pago(): HasOne

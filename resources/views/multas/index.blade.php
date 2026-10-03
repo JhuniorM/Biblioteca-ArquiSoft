@@ -8,7 +8,7 @@
 </head>
 <body class="min-h-screen bg-[#f8f3eb] font-sans text-[#27231f] antialiased">
     <main class="mx-auto max-w-4xl px-6 py-12 lg:px-12">
-        <div class="flex items-center justify-between gap-4"><a href="{{ route('catalogo.index') }}" class="font-display text-xl text-[#bd9360]">Biblioteca ArquiSoft</a><form action="{{ route('logout') }}" method="POST">@csrf<button class="text-xs font-bold uppercase tracking-[0.12em] text-[#716960]">Salir</button></form></div>
+        <div class="flex flex-wrap items-center justify-between gap-4"><a href="{{ route('catalogo.index') }}" class="font-display text-xl text-[#bd9360]">Biblioteca ArquiSoft</a><div class="flex flex-wrap items-center gap-5"><a href="{{ route('catalogo.index') }}" class="rounded-full border border-[#bd9360] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#9b7650]">Volver al cat&aacute;logo</a><form action="{{ route('logout') }}" method="POST">@csrf<button class="text-xs font-bold uppercase tracking-[0.12em] text-[#716960]">Salir</button></form></div></div>
         <h1 class="mt-16 font-display text-5xl text-[#302b26]">Multas pendientes</h1>
         @if (session('success'))<p class="mt-5 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-700">{{ session('success') }}</p>@endif
         <div class="mt-8 divide-y divide-[#e2d7ca] border-y border-[#e2d7ca]">

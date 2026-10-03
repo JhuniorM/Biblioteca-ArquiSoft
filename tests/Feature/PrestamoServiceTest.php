@@ -35,14 +35,16 @@ class PrestamoServiceTest extends TestCase
     {
         $libro = $this->crearLibro(1);
         $usuario = User::factory()->create();
+        $bibliotecario = User::factory()->create(['role' => 'bibliotecario']);
         $service = app(PrestamoService::class);
         $prestamo = $service->registrar($usuario, $libro, Carbon::parse('2026-10-01'));
 
-        $service->devolver($prestamo, Carbon::parse('2026-10-18'));
+        $service->devolver($prestamo, Carbon::parse('2026-10-18'), $bibliotecario);
 
         $this->assertDatabaseHas('prestamos', [
             'id' => $prestamo->id,
             'estado' => 'devuelto',
+            'devuelto_por_user_id' => $bibliotecario->id,
         ]);
         $this->assertDatabaseHas('libros', ['id' => $libro->id, 'ejemplares_disponibles' => 1]);
         $this->assertDatabaseHas('multas', [

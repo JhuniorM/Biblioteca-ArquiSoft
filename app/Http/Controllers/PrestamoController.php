@@ -16,7 +16,7 @@ class PrestamoController extends Controller
 
     public function devolver(Request $request, Prestamo $prestamo): RedirectResponse
     {
-        $this->prestamos->devolver($prestamo);
+        $this->prestamos->devolver($prestamo, null, $request->user());
 
         return redirect()->route('pagos.success', $prestamo)->with('success', 'Devolución registrada correctamente.');
     }
@@ -35,7 +35,7 @@ class PrestamoController extends Controller
 
         if ($request->filled('cliente')) {
             $cliente = User::query()
-                ->with(['prestamos.libro', 'prestamos.multa', 'prestamos.pago'])
+                ->with(['prestamos.libro', 'prestamos.multa', 'prestamos.pago', 'prestamos.devueltoPor'])
                 ->findOrFail($request->integer('cliente'));
         }
 
@@ -67,7 +67,7 @@ class PrestamoController extends Controller
         $estado = $request->string('estado')->toString();
 
         $prestamos = Prestamo::query()
-            ->with(['usuario', 'libro', 'multa'])
+            ->with(['usuario', 'libro', 'multa', 'devueltoPor'])
             ->when($buscar !== '', fn ($query) => $query->whereHas('usuario', function ($query) use ($buscar) {
                 $query->where('name', 'like', "%{$buscar}%")
                     ->orWhere('email', 'like', "%{$buscar}%");

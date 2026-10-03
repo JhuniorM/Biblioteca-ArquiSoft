@@ -50,7 +50,6 @@
         <section class="border-b border-[#e6dbce] bg-[#fbf8f3]">
             <div class="mx-auto grid max-w-[1200px] gap-6 px-6 py-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-12">
                 <div class="flex items-center gap-3 border-[#ded3c6] sm:border-r"><span class="text-2xl text-[#9b7650]">&#128218;</span><div><strong class="block text-xs">Gran variedad de libros</strong><span class="text-[10px] text-[#8b8178]">Miles de t&iacute;tulos disponibles</span></div></div>
-                <div class="flex items-center gap-3 border-[#ded3c6] lg:border-r"><span class="text-2xl text-[#9b7650]">&#128666;</span><div><strong class="block text-xs">Env&iacute;o a todo el pa&iacute;s</strong><span class="text-[10px] text-[#8b8178]">Recibe donde est&eacute;s</span></div></div>
                 <div class="flex items-center gap-3 border-[#ded3c6] sm:border-r"><span class="text-2xl text-[#9b7650]">&#10003;</span><div><strong class="block text-xs">Alquiler seguro</strong><span class="text-[10px] text-[#8b8178]">Proceso simple y confiable</span></div></div>
                 <div class="flex items-center gap-3"><span class="text-2xl text-[#9b7650]">&#9742;</span><div><strong class="block text-xs">Soporte 24/7</strong><span class="text-[10px] text-[#8b8178]">Estamos para ayudarte</span></div></div>
             </div>
