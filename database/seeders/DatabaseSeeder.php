@@ -17,19 +17,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Administrador ArquiSoft',
-            'email' => 'admin@arquisoft.test',
-            'password' => 'admin12345',
-            'role' => 'administrador',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@arquisoft.test'],
+            [
+                'name' => 'Administrador ArquiSoft',
+                'password' => 'admin12345',
+                'role' => 'administrador',
+            ],
+        );
 
-        User::factory()->create([
-            'name' => 'Bibliotecario ArquiSoft',
-            'email' => 'bibliotecario@arquisoft.test',
-            'password' => 'biblio12345',
-            'role' => 'bibliotecario',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'bibliotecario@arquisoft.test'],
+            [
+                'name' => 'Bibliotecario ArquiSoft',
+                'password' => 'biblio12345',
+                'role' => 'bibliotecario',
+            ],
+        );
 
         $categorias = collect([
             'Clasicos',
