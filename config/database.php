@@ -97,6 +97,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => env('DB_SEARCH_PATH', 'public'),
             'sslmode' => env('DB_SSLMODE', 'require'),
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                \PDO::ATTR_TIMEOUT => (int) env('DB_CONNECT_TIMEOUT', 5),
+            ]) : [],
         ],
 
         'sqlsrv' => [
