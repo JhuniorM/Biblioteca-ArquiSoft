@@ -36,6 +36,20 @@ npm run build
 php artisan serve
 ```
 
+## Ejecutar con Docker
+
+Configura las variables de entorno en `.env` y levanta la aplicación:
+
+```sh
+docker compose up --build
+```
+
+La aplicación estará disponible en `http://localhost:8080`. El contenedor no ejecuta migraciones automáticamente; ejecútalas cuando la base de datos esté configurada:
+
+```sh
+docker compose exec app php artisan migrate --seed
+```
+
 ## Credenciales demo
 
 Después de ejecutar `php artisan migrate --seed`, se crean estas cuentas para probar los permisos:
