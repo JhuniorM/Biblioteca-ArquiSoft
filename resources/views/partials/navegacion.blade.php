@@ -11,6 +11,9 @@
             <a href="{{ route('seccion', 'contacto') }}" class="transition hover:text-[#e1bd7c]">Contacto</a>
         </nav>
         @auth
+            @if (in_array(auth()->user()->role, ['cajero', 'bibliotecario', 'administrador'], true))
+                <a href="{{ route('pagos.gestion') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Consultar pagos</a>
+            @endif
             @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))
                 <a href="{{ route('prestamos.todos') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Préstamos registrados</a>
                 <a href="{{ route('prestamos.clientes') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Gestionar clientes</a>

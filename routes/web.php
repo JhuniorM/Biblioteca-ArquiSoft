@@ -50,6 +50,12 @@ Route::post('/gestion/clientes/registrar', [PrestamoController::class, 'registra
 Route::get('/gestion/prestamos', [PrestamoController::class, 'todos'])
     ->middleware(['auth', 'role:bibliotecario,administrador'])
     ->name('prestamos.todos');
+Route::get('/gestion/pagos', [PagoController::class, 'gestion'])
+    ->middleware(['auth', 'role:cajero,bibliotecario,administrador'])
+    ->name('pagos.gestion');
+Route::post('/gestion/pagos/{pago}/confirmar', [PagoController::class, 'confirmar'])
+    ->middleware(['auth', 'role:cajero,administrador'])
+    ->name('pagos.confirmar');
 Route::get('/categorias', function () {
     return view('categorias', [
         'categorias' => Categoria::query()->withCount('libros')->orderBy('nombre')->get(),

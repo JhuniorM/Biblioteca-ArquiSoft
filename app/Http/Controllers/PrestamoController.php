@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\User;
 use App\Models\Libro;
+use App\Models\Pago;
 
 class PrestamoController extends Controller
 {
@@ -16,7 +17,18 @@ class PrestamoController extends Controller
 
     public function devolver(Request $request, Prestamo $prestamo): RedirectResponse
     {
-        $this->prestamos->devolver($prestamo, null, $request->user());
+        $datos = $request->validate([
+            'estado_material' => ['required', 'in:bueno,danado,perdido'],
+            'observacion_devolucion' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $this->prestamos->devolver(
+            $prestamo,
+            null,
+            $request->user(),
+            $datos['estado_material'],
+            $datos['observacion_devolucion'] ?? null,
+        );
 
         return redirect()->route('pagos.success', $prestamo)->with('success', 'Devolución registrada correctamente.');
     }
@@ -92,10 +104,21 @@ class PrestamoController extends Controller
             ->findOrFail($datos['cliente_id']);
         $libro = Libro::query()->findOrFail($datos['libro_id']);
 
-        $this->prestamos->registrar($cliente, $libro);
+        $prestamo = $this->prestamos->registrarPendiente($cliente, $libro);
+
+        Pago::create([
+            'prestamo_id' => $prestamo->id,
+            'registrado_por_user_id' => $request->user()->id,
+            'monto_centavos' => config('biblioteca.precio_alquiler_centavos'),
+            'moneda' => 'PEN',
+            'metodo_pago' => 'pendiente',
+            'proveedor' => 'caja',
+            'estado' => 'pendiente',
+            'referencia' => 'ARQ-'.str()->upper(str()->random(12)),
+        ]);
 
         return redirect()->route('prestamos.clientes', ['cliente' => $cliente->id])
-            ->with('success', 'Préstamo registrado a nombre del cliente.');
+            ->with('success', 'Solicitud creada. El cliente debe pagar en caja antes de recibir el libro.');
     }
 
     public function registrarCliente(Request $request): RedirectResponse
@@ -103,12 +126,13 @@ class PrestamoController extends Controller
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
+            'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
         $cliente = User::create([
             'name' => $datos['name'],
             'email' => $datos['email'],
-            'password' => str()->random(32),
+            'password' => $datos['password'],
             'role' => 'estudiante',
         ]);
 
