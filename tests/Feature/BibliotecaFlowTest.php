@@ -5,70 +5,49 @@ namespace Tests\Feature;
 use App\Models\Categoria;
 use App\Models\Libro;
 use App\Models\Pago;
+use App\Models\Prestamo;
 use App\Models\User;
+use App\Services\PrestamoService;
+use Database\Seeders\CajeroSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class BibliotecaFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_checkout_autenticado_registra_pago_y_prestamo(): void
+    public function test_cliente_no_puede_autoregistrarse_ni_completar_un_checkout_publico(): void
     {
         $libro = $this->crearLibro();
 
-        $this->post('/registro', [
-            'name' => 'Ana Perez',
-            'email' => 'ana@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ])->assertRedirect(route('catalogo.index'));
-
-        $this->post(route('pagos.store', $libro), [
-            'metodo_pago' => 'tarjeta',
-            'numero_tarjeta' => '4111111111111111',
-            'vencimiento' => '12/30',
-            'cvv' => '123',
-        ])->assertRedirect();
-
-        $this->assertDatabaseHas('prestamos', ['libro_id' => $libro->id, 'estado' => 'activo']);
-        $this->assertDatabaseHas('pagos', ['metodo_pago' => 'tarjeta', 'ultimos_digitos' => '1111']);
-        $this->assertDatabaseMissing('pagos', ['referencia' => '4111111111111111']);
+        $this->get('/registro')->assertNotFound();
+        $this->get("/catalogo/{$libro->id}/alquilar")->assertNotFound();
+        $this->post("/catalogo/{$libro->id}/alquilar")->assertNotFound();
+        $this->get(route('catalogo.show', $libro))
+            ->assertOk()
+            ->assertSee('acércate a la biblioteca')
+            ->assertDontSee('Solicitar préstamo');
     }
 
-    public function test_checkout_permite_registrar_cliente_nuevo(): void
+    public function test_cliente_no_puede_iniciar_sesion_ni_consultar_prestamos(): void
     {
-        $libro = $this->crearLibro();
+        User::factory()->create([
+            'email' => 'cliente@example.com',
+            'password' => 'cliente12345',
+            'role' => 'estudiante',
+        ]);
 
-        $this->post(route('pagos.store', $libro), [
-            'nombre' => 'Cliente Desde Checkout',
-            'email' => 'checkout@example.com',
-            'metodo_pago' => 'tarjeta',
-            'numero_tarjeta' => '4111111111111111',
-            'vencimiento' => '12/30',
-            'cvv' => '123',
-        ])->assertRedirect();
+        $this->from(route('login'))
+            ->post(route('login.store'), [
+                'email' => 'cliente@example.com',
+                'password' => 'cliente12345',
+            ])
+            ->assertRedirect(route('login'))
+            ->assertSessionHasErrors('email');
 
-        $this->assertDatabaseHas('users', ['email' => 'checkout@example.com', 'role' => 'estudiante']);
-        $this->assertDatabaseHas('prestamos', ['libro_id' => $libro->id]);
-    }
-
-    public function test_entidad_bancaria_puede_rechazar_el_pago_antes_del_prestamo(): void
-    {
-        $libro = $this->crearLibro();
-
-        $this->post(route('pagos.store', $libro), [
-            'nombre' => 'Pago Rechazado',
-            'email' => 'rechazado@example.com',
-            'metodo_pago' => 'tarjeta',
-            'numero_tarjeta' => '4111111111110002',
-            'vencimiento' => '12/30',
-            'cvv' => '123',
-        ])->assertSessionHasErrors('pago');
-
-        $this->assertDatabaseCount('prestamos', 0);
-        $this->assertDatabaseCount('pagos', 0);
-        $this->assertDatabaseCount('comprobantes', 0);
+        $this->assertGuest();
+        $this->get(route('prestamos.index'))->assertRedirect(route('login'));
     }
 
     public function test_personal_puede_buscar_cliente_y_ver_su_historial(): void
@@ -83,13 +62,25 @@ class BibliotecaFlowTest extends TestCase
             ->assertSee('cliente@example.com');
     }
 
+    public function test_enlace_registrar_cliente_abre_el_formulario_de_clientes(): void
+    {
+        $personal = User::factory()->create(['role' => 'bibliotecario']);
+
+        $this->actingAs($personal)
+            ->get(route('prestamos.clientes', ['registrar' => 1]))
+            ->assertOk()
+            ->assertSee('id="registrar-cliente"', false)
+            ->assertSee('Registrar nuevo cliente')
+            ->assertSee('Guardar cliente y continuar');
+    }
+
     public function test_cajero_consulta_y_confirma_pago_registrado_por_bibliotecario(): void
     {
         $bibliotecario = User::factory()->create(['role' => 'bibliotecario']);
         $cajero = User::factory()->create(['role' => 'cajero']);
         $cliente = User::factory()->create(['name' => 'Cliente del pago']);
         $libro = $this->crearLibro();
-        $prestamo = app(\App\Services\PrestamoService::class)->registrarPendiente($cliente, $libro);
+        $prestamo = app(PrestamoService::class)->registrarPendiente($cliente, $libro);
         $pago = Pago::create([
             'prestamo_id' => $prestamo->id,
             'registrado_por_user_id' => $bibliotecario->id,
@@ -118,6 +109,121 @@ class BibliotecaFlowTest extends TestCase
         ]);
         $this->assertDatabaseHas('prestamos', ['id' => $prestamo->id, 'estado' => 'activo']);
         $this->assertDatabaseCount('comprobantes', 1);
+    }
+
+    public function test_flujo_completo_de_prestamo_pendiente_hasta_confirmacion_del_cajero(): void
+    {
+        $bibliotecario = User::factory()->create(['role' => 'bibliotecario']);
+        $cajero = User::factory()->create(['role' => 'cajero']);
+        $libro = $this->crearLibro();
+
+        $this->actingAs($bibliotecario)
+            ->post(route('prestamos.clientes.crear'), [
+                'name' => 'Cliente del flujo completo',
+                'email' => 'flujo@example.com',
+            ])
+            ->assertRedirect();
+
+        $cliente = User::query()->where('email', 'flujo@example.com')->firstOrFail();
+
+        $this->actingAs($bibliotecario)
+            ->post(route('prestamos.clientes.registrar'), [
+                'cliente_id' => $cliente->id,
+                'libro_id' => $libro->id,
+            ])
+            ->assertRedirect(route('prestamos.clientes', ['cliente' => $cliente->id]));
+
+        $prestamo = Prestamo::query()->where('user_id', $cliente->id)->firstOrFail();
+        $pago = $prestamo->pago()->firstOrFail();
+
+        $this->assertSame('pendiente_pago', $prestamo->estado);
+        $this->assertSame('pendiente', $pago->estado);
+        $this->assertDatabaseHas('libros', ['id' => $libro->id, 'ejemplares_disponibles' => 1]);
+
+        $this->actingAs($cajero)
+            ->get(route('pagos.gestion'))
+            ->assertOk()
+            ->assertSee('flujo@example.com')
+            ->assertSee($pago->referencia);
+
+        $this->actingAs($cajero)
+            ->post(route('pagos.confirmar', $pago), ['metodo_pago' => 'yape'])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('prestamos', ['id' => $prestamo->id, 'estado' => 'activo']);
+        $this->assertDatabaseHas('pagos', [
+            'id' => $pago->id,
+            'estado' => 'aprobado',
+            'confirmado_por_user_id' => $cajero->id,
+        ]);
+        $this->assertDatabaseHas('libros', ['id' => $libro->id, 'ejemplares_disponibles' => 0]);
+        $this->assertDatabaseCount('comprobantes', 1);
+    }
+
+    public function test_cajero_ve_la_lista_completa_de_prestamos_con_sus_clientes(): void
+    {
+        $cajero = User::factory()->create(['role' => 'cajero', 'name' => 'Cajero de Prueba']);
+        $bibliotecario = User::factory()->create(['role' => 'bibliotecario']);
+        $cliente = User::factory()->create(['name' => 'Cliente Presencial', 'email' => 'cliente-presencial@example.com']);
+        $libroRegistrado = $this->crearLibro('Libro registrado por el personal');
+        $prestamoRegistrado = app(PrestamoService::class)->registrarPendiente($cliente, $libroRegistrado);
+
+        Pago::create([
+            'prestamo_id' => $prestamoRegistrado->id,
+            'registrado_por_user_id' => $bibliotecario->id,
+            'monto_centavos' => 1000,
+            'metodo_pago' => 'pendiente',
+            'proveedor' => 'caja',
+            'estado' => 'pendiente',
+            'referencia' => 'ARQ-CLIENTE-REGISTRADO',
+        ]);
+
+        $otroCliente = User::factory()->create(['name' => 'Cliente de otro préstamo']);
+        $libroNoRegistrado = $this->crearLibro('Libro no registrado por personal');
+        app(PrestamoService::class)->registrar($otroCliente, $libroNoRegistrado);
+
+        $this->actingAs($cajero)
+            ->get(route('prestamos.index'))
+            ->assertOk()
+            ->assertSee('Préstamos registrados')
+            ->assertSee('Cliente Presencial')
+            ->assertSee('cliente-presencial@example.com')
+            ->assertSee('Libro registrado por el personal')
+            ->assertSee('pendiente')
+            ->assertSee('Libro no registrado por personal')
+            ->assertSee('Cliente de otro préstamo')
+            ->assertDontSee('Cajero de Prueba');
+    }
+
+    public function test_cajero_configurado_se_crea_y_puede_entrar_a_gestion_de_pagos(): void
+    {
+        config()->set('biblioteca.cajero', [
+            'nombre' => 'Cajero de Prueba',
+            'email' => 'caja@example.com',
+            'password' => 'contrasena-segura-123',
+        ]);
+
+        $this->seed(CajeroSeeder::class);
+
+        $cajero = User::query()->where('email', 'caja@example.com')->firstOrFail();
+
+        $this->assertSame('cajero', $cajero->role);
+        $this->assertTrue(Hash::check('contrasena-segura-123', $cajero->password));
+
+        $this->post(route('login.store'), [
+            'email' => 'caja@example.com',
+            'password' => 'contrasena-segura-123',
+        ])->assertRedirect(route('catalogo.index'));
+
+        $this->get(route('pagos.gestion'))
+            ->assertOk()
+            ->assertSee(route('pagos.gestion'))
+            ->assertSee('Consultar pagos');
+
+        $this->get(route('catalogo.index'))
+            ->assertOk()
+            ->assertSee(route('pagos.gestion'))
+            ->assertSee('Gestión de pagos');
     }
 
     public function test_estudiante_no_puede_consultar_panel_de_pagos(): void
@@ -162,7 +268,7 @@ class BibliotecaFlowTest extends TestCase
         $personal = User::factory()->create(['role' => 'bibliotecario']);
         $cliente = User::factory()->create(['name' => 'Cliente del Libro', 'email' => 'dueno@example.com']);
         $libro = $this->crearLibro();
-        app(\App\Services\PrestamoService::class)->registrar($cliente, $libro);
+        app(PrestamoService::class)->registrar($cliente, $libro);
 
         $this->actingAs($personal)
             ->get(route('prestamos.todos'))
@@ -180,8 +286,6 @@ class BibliotecaFlowTest extends TestCase
             ->post(route('prestamos.clientes.crear'), [
                 'name' => 'Cliente Nuevo',
                 'email' => 'nuevo@example.com',
-                'password' => 'cliente12345',
-                'password_confirmation' => 'cliente12345',
             ])
             ->assertRedirect();
 
@@ -190,36 +294,17 @@ class BibliotecaFlowTest extends TestCase
             'email' => 'nuevo@example.com',
             'role' => 'estudiante',
         ]);
-
-        $this->post(route('login.store'), [
-            'email' => 'nuevo@example.com',
-            'password' => 'cliente12345',
-        ])->assertRedirect(route('catalogo.index'));
+        $cliente = User::query()->where('email', 'nuevo@example.com')->firstOrFail();
+        $this->assertFalse(Hash::check('cualquier-password', $cliente->password));
     }
 
-    public function test_personal_con_modal_asigna_el_prestamo_al_cliente_indicado(): void
+    private function crearLibro(string $titulo = 'El archivo'): Libro
     {
-        $personal = User::factory()->create(['role' => 'bibliotecario']);
-        $libro = $this->crearLibro();
-
-        $this->actingAs($personal)->post(route('pagos.store', $libro), [
-            'nombre' => 'Cliente Presencial',
-            'email' => 'presencial@example.com',
-            'metodo_pago' => 'yape',
-        ])->assertRedirect();
-
-        $cliente = User::query()->where('email', 'presencial@example.com')->firstOrFail();
-        $this->assertDatabaseHas('prestamos', ['user_id' => $cliente->id, 'libro_id' => $libro->id]);
-        $this->assertDatabaseMissing('prestamos', ['user_id' => $personal->id, 'libro_id' => $libro->id]);
-    }
-
-    private function crearLibro(): Libro
-    {
-        $categoria = Categoria::create(['nombre' => 'Novela']);
+        $categoria = Categoria::firstOrCreate(['nombre' => 'Novela']);
 
         return Libro::create([
             'categoria_id' => $categoria->id,
-            'titulo' => 'El archivo',
+            'titulo' => $titulo,
             'autor' => 'Ana Autor',
             'ejemplares_totales' => 1,
             'ejemplares_disponibles' => 1,

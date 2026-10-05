@@ -7,14 +7,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-[#f8f3eb] font-sans text-[#27231f] antialiased">
+    @include('partials.navegacion', ['active' => ''])
     <main class="mx-auto max-w-6xl px-6 py-12 lg:px-12">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <a href="{{ route('catalogo.index') }}" class="font-display text-xl text-[#bd9360]">Biblioteca ArquiSoft</a>
-            <div class="flex items-center gap-5 text-xs font-bold uppercase tracking-[0.12em] text-[#716960]">
-                <a href="{{ route('prestamos.index') }}">Mis préstamos</a>
-                <form action="{{ route('logout') }}" method="POST">@csrf<button>Salir</button></form>
-            </div>
-        </div>
         <p class="mt-16 text-[10px] font-bold uppercase tracking-[0.3em] text-[#bd9360]">Control financiero</p>
         <h1 class="mt-3 font-display text-5xl text-[#302b26]">Pagos registrados</h1>
         <p class="mt-3 max-w-2xl text-sm leading-6 text-[#716960]">Consulta los pagos registrados por el personal y confirma las operaciones pendientes de revisión.</p>
@@ -29,7 +23,7 @@
                     @forelse ($pagos as $pago)
                         <tr>
                             <td class="px-3 py-5 font-semibold text-[#302b26]">{{ $pago->referencia }}<p class="mt-1 text-xs font-normal text-[#716960]">{{ $pago->metodo_pago }}</p></td>
-                            <td class="px-3 py-5">{{ $pago->prestamo->usuario->name }}</td>
+                            <td class="px-3 py-5">{{ $pago->prestamo->usuario->name }}<p class="mt-1 text-xs text-[#716960]">{{ $pago->prestamo->usuario->email }}</p></td>
                             <td class="px-3 py-5">{{ $pago->prestamo->libro->titulo }}</td>
                             <td class="px-3 py-5">S/ {{ number_format($pago->monto_centavos / 100, 2) }}</td>
                             <td class="px-3 py-5 text-[#716960]">{{ $pago->registradoPor?->name ?? 'Cliente / sistema' }}</td>

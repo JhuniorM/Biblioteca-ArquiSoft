@@ -22,18 +22,13 @@ Route::get('/', function () {
 Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
 Route::get('/pages/catalogo.html', [CatalogoController::class, 'index'])->name('catalogo.legacy');
 Route::get('/catalogo/{libro}', [CatalogoController::class, 'show'])->name('catalogo.show');
-Route::get('/catalogo/{libro}/alquilar', [PagoController::class, 'create'])->name('pagos.create');
-Route::post('/catalogo/{libro}/alquilar', [PagoController::class, 'store'])->name('pagos.store');
-Route::get('/prestamos/{prestamo}/pago-exitoso', [PagoController::class, 'success'])->name('pagos.success');
 Route::post('/prestamos/{prestamo}/devolver', [PrestamoController::class, 'devolver'])
     ->middleware(['auth', 'role:bibliotecario,administrador'])
     ->name('prestamos.devolver');
 Route::get('/login', [AuthController::class, 'create'])->name('login');
 Route::post('/login', [AuthController::class, 'store'])->name('login.store');
-Route::get('/registro', [AuthController::class, 'register'])->name('register');
-Route::post('/registro', [AuthController::class, 'storeRegistration'])->name('register.store');
 Route::post('/logout', [AuthController::class, 'destroy'])->middleware('auth')->name('logout');
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:cajero,bibliotecario,administrador'])->group(function () {
     Route::get('/mis-prestamos', [PrestamoController::class, 'index'])->name('prestamos.index');
     Route::get('/mis-multas', [MultaController::class, 'index'])->name('multas.index');
     Route::post('/multas/{multa}/pagar', [MultaController::class, 'pagar'])->name('multas.pagar');

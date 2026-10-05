@@ -5,41 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
-use App\Models\User;
 
 class AuthController extends Controller
 {
     public function create(): View
     {
         return view('auth.login');
-    }
-
-    public function register(): View
-    {
-        return view('auth.register');
-    }
-
-    public function storeRegistration(Request $request): RedirectResponse
-    {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:150', 'unique:users,email'],
-            'password' => ['required', 'confirmed', 'min:8'],
-        ]);
-
-        $usuario = User::create([
-            'name' => $datos['name'],
-            'email' => $datos['email'],
-            'password' => Hash::make($datos['password']),
-            'role' => 'estudiante',
-        ]);
-
-        Auth::login($usuario);
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('catalogo.index'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -53,9 +25,19 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Las credenciales no son válidas.'])->onlyInput('email');
         }
 
+        $usuario = Auth::user();
+
+        if (! $usuario || ! in_array($usuario->role, ['bibliotecario', 'cajero', 'administrador'], true)) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors(['email' => 'El acceso está reservado para el personal de la biblioteca.'])->onlyInput('email');
+        }
+
         $request->session()->regenerate();
 
-            return redirect()->intended(route('catalogo.index'));
+        return redirect()->intended(route('catalogo.index'));
     }
 
     public function destroy(Request $request): RedirectResponse

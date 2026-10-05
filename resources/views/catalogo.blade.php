@@ -20,10 +20,12 @@
                 <a href="{{ route('seccion', 'contacto') }}" class="transition hover:text-[#e1bd7c]">Contacto</a>
                 @auth
                     @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))
-                        <a href="{{ route('prestamos.todos') }}" class="transition hover:text-[#e1bd7c]">Pr&eacute;stamos</a>
-                        <a href="{{ route('prestamos.clientes') }}" class="transition hover:text-[#e1bd7c]">Clientes</a>
+                        <a href="{{ route('prestamos.clientes', ['registrar' => 1]) }}#registrar-cliente" class="transition hover:text-[#e1bd7c]">Registrar cliente</a>
                     @endif
-                    <a href="{{ route('prestamos.index') }}" class="transition hover:text-[#e1bd7c]">Mis pr&eacute;stamos</a>
+                    @if (in_array(auth()->user()->role, ['cajero', 'bibliotecario', 'administrador'], true))
+                        <a href="{{ route('pagos.gestion') }}" class="transition hover:text-[#e1bd7c]">Gesti&oacute;n de pagos</a>
+                    @endif
+                    <a href="{{ route('prestamos.index') }}" class="transition hover:text-[#e1bd7c]">Pr&eacute;stamos registrados</a>
                 @endauth
             </nav>
             <form action="{{ url()->current() }}" method="GET" class="ml-auto hidden w-full max-w-[235px] items-center rounded-full bg-[#fbf8f3] px-3 py-2 text-[#777069] md:flex">
@@ -34,7 +36,7 @@
                 <input type="hidden" name="disponibilidad" value="{{ $disponibilidad }}">
                 @if ($titulo)<a href="{{ url()->current() }}" aria-label="Limpiar b&uacute;squeda" class="ml-2 text-base leading-none text-[#a39b92]">&times;</a>@endif
             </form>
-            <details class="relative xl:hidden"><summary class="cursor-pointer list-none rounded-full border border-[#6e5940] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#e1bd7c]">Menú</summary><div class="absolute right-0 top-12 z-20 w-56 rounded-xl bg-[#24211f] p-4 shadow-xl"><a href="{{ url('/') }}" class="block border-b border-white/10 py-2 text-xs">Inicio</a><a href="{{ route('categorias.index') }}" class="block border-b border-white/10 py-2 text-xs">Categorías</a><a href="{{ route('seccion', 'como-funciona') }}" class="block border-b border-white/10 py-2 text-xs">Cómo funciona</a>@auth @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))<a href="{{ route('prestamos.todos') }}" class="block border-b border-white/10 py-2 text-xs">Préstamos</a><a href="{{ route('prestamos.clientes') }}" class="block border-b border-white/10 py-2 text-xs">Clientes</a>@endif<a href="{{ route('prestamos.index') }}" class="block border-b border-white/10 py-2 text-xs">Mis préstamos</a><form action="{{ route('logout') }}" method="POST" class="py-2">@csrf<button type="submit" class="text-xs">Salir</button></form>@else<a href="{{ route('login') }}" class="block py-2 text-xs">Ingresar</a>@endauth</div></details>
+            <details class="relative xl:hidden"><summary class="cursor-pointer list-none rounded-full border border-[#6e5940] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#e1bd7c]">Menú</summary><div class="absolute right-0 top-12 z-20 w-56 rounded-xl bg-[#24211f] p-4 shadow-xl"><a href="{{ url('/') }}" class="block border-b border-white/10 py-2 text-xs">Inicio</a><a href="{{ route('categorias.index') }}" class="block border-b border-white/10 py-2 text-xs">Categorías</a><a href="{{ route('seccion', 'como-funciona') }}" class="block border-b border-white/10 py-2 text-xs">Cómo funciona</a>@auth @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))<a href="{{ route('prestamos.clientes', ['registrar' => 1]) }}#registrar-cliente" class="block border-b border-white/10 py-2 text-xs">Registrar cliente</a>@endif @if (in_array(auth()->user()->role, ['cajero', 'bibliotecario', 'administrador'], true))<a href="{{ route('pagos.gestion') }}" class="block border-b border-white/10 py-2 text-xs">Gestión de pagos</a>@endif<a href="{{ route('prestamos.index') }}" class="block border-b border-white/10 py-2 text-xs">Préstamos registrados</a><form action="{{ route('logout') }}" method="POST" class="py-2">@csrf<button type="submit" class="text-xs">Salir</button></form>@else<a href="{{ route('login') }}" class="block py-2 text-xs">Ingresar</a>@endauth</div></details>
         </div>
     </header>
 

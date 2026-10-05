@@ -12,7 +12,7 @@
             @csrf
             <a href="{{ url('/') }}" class="font-display text-xl text-[#bd9360]">Biblioteca ArquiSoft</a>
             <h1 class="mt-8 font-display text-4xl text-[#302b26]">Iniciar sesión</h1>
-            <p class="mt-3 text-sm text-[#716960]">Consulta tus préstamos y multas pendientes.</p>
+            <p class="mt-3 text-sm text-[#716960]">Acceso exclusivo para administrador, bibliotecario y cajero.</p>
             @if ($errors->any())<div class="mt-5 rounded-lg bg-rose-50 p-4 text-sm text-rose-700">{{ $errors->first() }}</div>@endif
             <label class="mt-8 block text-sm text-[#716960]">Correo<input name="email" type="email" value="{{ old('email') }}" required class="mt-2 w-full rounded-lg border border-[#ded3c6] bg-white px-4 py-3"></label>
             <label class="mt-4 block text-sm text-[#716960]">Contraseña<input name="password" type="password" required class="mt-2 w-full rounded-lg border border-[#ded3c6] bg-white px-4 py-3"></label>

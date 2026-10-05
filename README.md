@@ -17,8 +17,9 @@ Sistema web para gestionar el catálogo, préstamos, devoluciones y multas de la
 - Registro transaccional de préstamos con control de ejemplares y vencimiento de 15 días.
 - Devolución autorizada para bibliotecarios y administradores.
 - Cálculo configurable de multa por atraso (`BIBLIOTECA_MULTA_POR_DIA_CENTAVOS`).
-- Inicio de sesión, roles (`estudiante`, `bibliotecario`, `cajero`, `administrador`) y consulta/pago de multas.
-- Pago demo de alquiler con referencia trazable.
+- Inicio de sesión exclusivo para los roles de personal (`bibliotecario`, `cajero`, `administrador`).
+- Registro presencial de clientes y préstamos por el bibliotecario, con estado pendiente de pago.
+- Confirmación del pago por el cajero; solo al aprobarse se activa el préstamo y se genera el comprobante.
 
 ## Arquitectura
 
@@ -56,10 +57,24 @@ Después de ejecutar `php artisan migrate --seed`, se crean estas cuentas para p
 
 | Perfil | Correo | Contraseña | Accesos principales |
 | --- | --- | --- | --- |
-| Administrador | `admin@arquisoft.test` | `admin12345` | Devoluciones y control general. |
-| Bibliotecario | `bibliotecario@arquisoft.test` | `biblio12345` | Registro y gestión de devoluciones. |
+| Administrador | `admin@arquisoft.test` | `admin12345` | Control general. |
+| Bibliotecario | `bibliotecario@arquisoft.test` | `biblio12345` | Registro de clientes, préstamos y devoluciones. |
+| Cajero | Configurado por variables de entorno | Configurada por variables de entorno | Confirmación de pagos en `/gestion/pagos`. |
 
 Estas credenciales son solo para desarrollo local. En producción deben cambiarse o eliminarse.
+
+### Habilitar el cajero en Supabase
+
+La cuenta se crea en la base de datos a la que apunta la aplicación Laravel. En el entorno que tenga configurada la conexión de Supabase, establece `BIBLIOTECA_CAJERO_NOMBRE`, `BIBLIOTECA_CAJERO_EMAIL` y `BIBLIOTECA_CAJERO_PASSWORD` (usa una contraseña única de al menos 12 caracteres). Luego ejecuta:
+
+```sh
+php artisan config:clear
+php artisan db:seed --class='Database\Seeders\CajeroSeeder'
+```
+
+El seeder crea la cuenta o actualiza el rol de una cuenta existente con ese correo. Después, el cajero inicia sesión en `/login` y entra a **Consultar pagos** para confirmar los pagos pendientes. No ejecutes este seeder desde el SQL Editor de Supabase: debe ejecutarse mediante Laravel para que la contraseña se guarde con hash.
+
+Los clientes son atendidos presencialmente y no inician sesión. El catálogo público es solo de consulta; el préstamo se solicita al bibliotecario, queda pendiente de pago y el cajero lo activa tras confirmar el pago.
 
 ## About Laravel
 

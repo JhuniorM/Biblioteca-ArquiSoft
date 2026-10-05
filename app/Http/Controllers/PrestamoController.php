@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Libro;
+use App\Models\Pago;
 use App\Models\Prestamo;
+use App\Models\User;
 use App\Services\PrestamoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Models\User;
-use App\Models\Libro;
-use App\Models\Pago;
 
 class PrestamoController extends Controller
 {
@@ -30,19 +30,18 @@ class PrestamoController extends Controller
             $datos['observacion_devolucion'] ?? null,
         );
 
-        return redirect()->route('pagos.success', $prestamo)->with('success', 'Devolución registrada correctamente.');
+        return redirect()->route('prestamos.todos')->with('success', 'Devolución registrada correctamente.');
     }
 
     public function index(Request $request): View
     {
-        return view('prestamos.index', [
-            'prestamos' => $request->user()->prestamos()->with(['libro', 'pago', 'multa'])->latest('fecha_prestamo')->get(),
-        ]);
+        return $this->vistaPrestamosRegistrados($request, 'prestamos.index');
     }
 
     public function clientes(Request $request): View
     {
         $buscar = $request->string('buscar')->trim()->toString();
+        $mostrarRegistro = $request->boolean('registrar');
         $cliente = null;
 
         if ($request->filled('cliente')) {
@@ -70,26 +69,31 @@ class PrestamoController extends Controller
             ->orderBy('titulo')
             ->get(['id', 'titulo', 'autor', 'ejemplares_disponibles']);
 
-        return view('prestamos.clientes', compact('buscar', 'clientes', 'cliente', 'librosDisponibles'));
+        return view('prestamos.clientes', compact('buscar', 'clientes', 'cliente', 'librosDisponibles', 'mostrarRegistro'));
     }
 
     public function todos(Request $request): View
+    {
+        return $this->vistaPrestamosRegistrados($request, 'prestamos.todos');
+    }
+
+    private function vistaPrestamosRegistrados(Request $request, string $rutaFiltros): View
     {
         $buscar = $request->string('buscar')->trim()->toString();
         $estado = $request->string('estado')->toString();
 
         $prestamos = Prestamo::query()
-            ->with(['usuario', 'libro', 'multa', 'devueltoPor'])
+            ->with(['usuario', 'libro', 'multa', 'devueltoPor', 'pago'])
             ->when($buscar !== '', fn ($query) => $query->whereHas('usuario', function ($query) use ($buscar) {
                 $query->where('name', 'like', "%{$buscar}%")
                     ->orWhere('email', 'like', "%{$buscar}%");
             }))
-            ->when(in_array($estado, ['activo', 'devuelto'], true), fn ($query) => $query->where('estado', $estado))
+            ->when(in_array($estado, ['activo', 'pendiente_pago', 'devuelto'], true), fn ($query) => $query->where('estado', $estado))
             ->latest('fecha_prestamo')
             ->paginate(15)
             ->withQueryString();
 
-        return view('prestamos.todos', compact('prestamos', 'buscar', 'estado'));
+        return view('prestamos.todos', compact('prestamos', 'buscar', 'estado', 'rutaFiltros'));
     }
 
     public function registrarParaCliente(Request $request): RedirectResponse
@@ -126,13 +130,12 @@ class PrestamoController extends Controller
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
-            'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
         $cliente = User::create([
             'name' => $datos['name'],
             'email' => $datos['email'],
-            'password' => $datos['password'],
+            'password' => str()->random(40),
             'role' => 'estudiante',
         ]);
 

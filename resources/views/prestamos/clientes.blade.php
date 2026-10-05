@@ -7,8 +7,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-[#f8f3eb] font-sans text-[#27231f] antialiased">
+    @include('partials.navegacion', ['active' => ''])
     <main class="mx-auto max-w-6xl px-6 py-12 lg:px-12">
-        <div class="flex flex-wrap items-center justify-between gap-4"><a href="{{ route('catalogo.index') }}" class="font-display text-xl text-[#bd9360]">Biblioteca ArquiSoft</a><div class="flex flex-wrap items-center gap-5 text-xs font-bold uppercase tracking-[0.12em] text-[#716960]"><a href="{{ route('catalogo.index') }}" class="rounded-full border border-[#bd9360] px-4 py-2 text-[#9b7650]">Volver al cat&aacute;logo</a><a href="{{ route('prestamos.index') }}">Mis pr&eacute;stamos</a><form action="{{ route('logout') }}" method="POST">@csrf<button>Salir</button></form></div></div>
         <p class="mt-16 text-[10px] font-bold uppercase tracking-[0.3em] text-[#bd9360]">Panel de personal</p>
         <h1 class="mt-3 font-display text-5xl text-[#302b26]">Clientes e historiales</h1>
         <p class="mt-3 max-w-2xl text-sm leading-6 text-[#716960]">Busca por nombre o correo para identificar a cada cliente y consultar solamente sus préstamos y multas.</p>
@@ -20,14 +20,12 @@
             <button class="rounded-full bg-[#24211f] px-6 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white">Buscar</button>
         </form>
 
-        <details class="mt-6 max-w-2xl rounded-2xl bg-[#fbf8f3] p-5 shadow-sm">
+        <details id="registrar-cliente" class="mt-6 max-w-2xl rounded-2xl bg-[#fbf8f3] p-5 shadow-sm" @if ($mostrarRegistro) open @endif>
             <summary class="cursor-pointer text-xs font-bold uppercase tracking-[0.14em] text-[#9b7650]">Registrar nuevo cliente</summary>
             <form action="{{ route('prestamos.clientes.crear') }}" method="POST" class="mt-5 grid gap-3 sm:grid-cols-2">
                 @csrf
                 <input name="name" placeholder="Nombre completo" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
                 <input name="email" type="email" placeholder="Correo electrónico" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
-                <input name="password" type="password" placeholder="Contraseña del cliente" minlength="8" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
-                <input name="password_confirmation" type="password" placeholder="Confirmar contraseña" minlength="8" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
                 <button class="rounded-full bg-[#24211f] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white sm:col-span-2">Guardar cliente y continuar</button>
             </form>
         </details>

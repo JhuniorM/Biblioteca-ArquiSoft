@@ -15,14 +15,12 @@
                 <a href="{{ route('pagos.gestion') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Consultar pagos</a>
             @endif
             @if (in_array(auth()->user()->role, ['bibliotecario', 'administrador'], true))
-                <a href="{{ route('prestamos.todos') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Préstamos registrados</a>
-                <a href="{{ route('prestamos.clientes') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Gestionar clientes</a>
+                <a href="{{ route('prestamos.clientes', ['registrar' => 1]) }}#registrar-cliente" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Registrar cliente</a>
             @endif
-            <a href="{{ route('prestamos.index') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Mis préstamos</a>
+            <a href="{{ route('prestamos.index') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">{{ in_array(auth()->user()->role, ['cajero', 'bibliotecario', 'administrador'], true) ? 'Préstamos registrados' : 'Mis préstamos' }}</a>
             <form action="{{ route('logout') }}" method="POST">@csrf<button class="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Salir</button></form>
         @else
             <a href="{{ route('login') }}" class="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7d0c7] hover:text-[#e1bd7c]">Ingresar</a>
-            <a href="{{ route('register') }}" class="rounded-full border border-[#d2a45e] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e1bd7c] transition hover:bg-[#d2a45e] hover:text-[#151311]">Crear cuenta</a>
         @endauth
     </div>
 </header>
