@@ -26,6 +26,7 @@
                 @csrf
                 <input name="name" placeholder="Nombre completo" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
                 <input name="email" type="email" placeholder="Correo electrónico" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
+                <input name="documento_identidad" placeholder="DNI o carnet" maxlength="30" required class="rounded-lg border border-[#ded3c6] bg-white px-4 py-3 text-sm">
                 <button class="rounded-full bg-[#24211f] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white sm:col-span-2">Guardar cliente y continuar</button>
             </form>
         </details>
@@ -34,7 +35,7 @@
             <section class="divide-y divide-[#e2d7ca] border-y border-[#e2d7ca]">
                 @forelse ($clientes as $item)
                     <a href="{{ route('prestamos.clientes', ['cliente' => $item->id, 'buscar' => $buscar]) }}" class="block px-2 py-5 transition hover:bg-white">
-                        <div class="flex items-start justify-between gap-4"><div><h2 class="font-display text-xl text-[#302b26]">{{ $item->name }}</h2><p class="mt-1 text-xs text-[#716960]">{{ $item->email }} · Cliente #{{ $item->id }}</p></div><span class="rounded-full bg-[#e5ddd3] px-3 py-1 text-[10px] font-bold text-[#716960]">{{ $item->prestamos_activos }} activos</span></div>
+                        <div class="flex items-start justify-between gap-4"><div><h2 class="font-display text-xl text-[#302b26]">{{ $item->name }}</h2><p class="mt-1 text-xs text-[#716960]">{{ $item->email }} · DNI/carnet: {{ $item->documento_identidad ?? 'No registrado' }} · Cliente #{{ $item->id }}</p></div><span class="rounded-full bg-[#e5ddd3] px-3 py-1 text-[10px] font-bold text-[#716960]">{{ $item->prestamos_activos }} activos</span></div>
                         <p class="mt-3 text-xs text-[#8b8178]">{{ $item->prestamos_count }} préstamos registrados</p>
                     </a>
                 @empty
@@ -46,7 +47,7 @@
                 @if ($cliente)
                     <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#bd9360]">Historial del cliente #{{ $cliente->id }}</p>
                     <h2 class="mt-3 font-display text-3xl text-[#302b26]">{{ $cliente->name }}</h2>
-                    <p class="mt-1 text-sm text-[#716960]">{{ $cliente->email }} · Cliente #{{ $cliente->id }}</p>
+                    <p class="mt-1 text-sm text-[#716960]">{{ $cliente->email }} · DNI/carnet: {{ $cliente->documento_identidad ?? 'No registrado' }} · Cliente #{{ $cliente->id }}</p>
                     <form action="{{ route('prestamos.clientes.registrar') }}" method="POST" class="mt-6 border-y border-[#e2d7ca] py-5">
                         @csrf
                         <input type="hidden" name="cliente_id" value="{{ $cliente->id }}">

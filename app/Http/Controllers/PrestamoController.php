@@ -130,11 +130,13 @@ class PrestamoController extends Controller
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
+            'documento_identidad' => ['required', 'string', 'max:30', 'unique:users,documento_identidad'],
         ]);
 
         $cliente = User::create([
             'name' => $datos['name'],
             'email' => $datos['email'],
+            'documento_identidad' => $datos['documento_identidad'],
             'password' => str()->random(40),
             'role' => 'estudiante',
         ]);

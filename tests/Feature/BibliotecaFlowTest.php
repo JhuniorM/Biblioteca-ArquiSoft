@@ -71,6 +71,7 @@ class BibliotecaFlowTest extends TestCase
             ->assertOk()
             ->assertSee('id="registrar-cliente"', false)
             ->assertSee('Registrar nuevo cliente')
+            ->assertSee('DNI o carnet')
             ->assertSee('Guardar cliente y continuar');
     }
 
@@ -121,10 +122,15 @@ class BibliotecaFlowTest extends TestCase
             ->post(route('prestamos.clientes.crear'), [
                 'name' => 'Cliente del flujo completo',
                 'email' => 'flujo@example.com',
+                'documento_identidad' => '12345678',
             ])
             ->assertRedirect();
 
         $cliente = User::query()->where('email', 'flujo@example.com')->firstOrFail();
+        $this->assertDatabaseHas('users', [
+            'id' => $cliente->id,
+            'documento_identidad' => '12345678',
+        ]);
 
         $this->actingAs($bibliotecario)
             ->post(route('prestamos.clientes.registrar'), [
@@ -286,12 +292,14 @@ class BibliotecaFlowTest extends TestCase
             ->post(route('prestamos.clientes.crear'), [
                 'name' => 'Cliente Nuevo',
                 'email' => 'nuevo@example.com',
+                'documento_identidad' => '87654321',
             ])
             ->assertRedirect();
 
         $this->assertDatabaseHas('users', [
             'name' => 'Cliente Nuevo',
             'email' => 'nuevo@example.com',
+            'documento_identidad' => '87654321',
             'role' => 'estudiante',
         ]);
         $cliente = User::query()->where('email', 'nuevo@example.com')->firstOrFail();
