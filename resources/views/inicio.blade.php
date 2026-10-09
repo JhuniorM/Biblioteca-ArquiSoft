@@ -61,7 +61,13 @@
                 @foreach ($libros as $libro)
                     @php($initials = collect(explode(' ', trim($libro->titulo)))->filter()->take(2)->map(fn ($word) => strtoupper(substr($word, 0, 1)))->join(''))
                     <article class="rounded-sm bg-white p-4 text-center shadow-[0_8px_20px_rgba(55,43,31,0.08)]">
-                        <div class="mx-auto flex aspect-[2/3] max-w-[190px] flex-col justify-between bg-gradient-to-br from-[#315756] via-[#527775] to-[#d6a861] p-4 text-left text-white"><span class="text-[8px] uppercase tracking-[0.2em] text-white/75">Biblioteca ArquiSoft</span><span class="font-display text-4xl">{{ $initials }}</span><span><span class="block font-display text-lg leading-tight">{{ $libro->titulo }}</span><span class="mt-2 block text-[9px] text-white/80">{{ $libro->autor }}</span></span></div>
+                        <div class="mx-auto aspect-[2/3] max-w-[190px] overflow-hidden bg-gradient-to-br from-[#315756] via-[#527775] to-[#d6a861]">
+                            @if ($libro->portada_url)
+                                <img src="{{ $libro->portada_url }}" alt="Portada de {{ $libro->titulo }}" class="h-full w-full object-cover">
+                            @else
+                                <div role="img" aria-label="Portada de {{ $libro->titulo }}" class="flex h-full flex-col justify-between p-4 text-left text-white"><span class="text-[8px] uppercase tracking-[0.2em] text-white/75">Biblioteca ArquiSoft</span><span class="font-display text-4xl">{{ $initials }}</span><span><span class="block font-display text-lg leading-tight">{{ $libro->titulo }}</span><span class="mt-2 block text-[9px] text-white/80">{{ $libro->autor }}</span></span></div>
+                            @endif
+                        </div>
                         <h3 class="mt-4 font-display text-lg text-[#302b26]">{{ $libro->titulo }}</h3><p class="mt-1 text-[10px] text-[#8b8178]">{{ $libro->autor }}</p><a href="{{ route('catalogo.show', $libro) }}" class="mt-4 block rounded-sm bg-[#24211f] py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#bd9360]">Ver detalle</a>
                     </article>
                 @endforeach

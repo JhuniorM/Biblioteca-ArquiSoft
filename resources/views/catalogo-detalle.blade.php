@@ -11,7 +11,13 @@
     <main class="mx-auto max-w-5xl px-6 py-14 lg:px-12">
         <a href="{{ route('catalogo.index') }}" class="text-xs font-bold uppercase tracking-[0.14em] text-[#9b7650]">&larr; Volver al cat&aacute;logo</a>
         <div class="mt-10 grid gap-10 md:grid-cols-[240px_1fr]">
-            <div class="flex aspect-[2/3] items-center justify-center bg-[#315756] p-6 text-center font-display text-4xl text-white shadow-xl">{{ $libro->titulo }}</div>
+            <div class="flex aspect-[2/3] items-center justify-center overflow-hidden bg-[#315756] p-6 text-center font-display text-4xl text-white shadow-xl">
+                @if ($libro->portada_url)
+                    <img src="{{ $libro->portada_url }}" alt="Portada de {{ $libro->titulo }}" class="h-full w-full object-cover">
+                @else
+                    {{ $libro->titulo }}
+                @endif
+            </div>
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#bd9360]">{{ $libro->categoria?->nombre }}</p>
                 <h1 class="mt-3 font-display text-5xl leading-tight text-[#302b26]">{{ $libro->titulo }}</h1>

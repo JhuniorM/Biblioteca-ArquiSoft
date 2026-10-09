@@ -30,6 +30,21 @@ class BibliotecaFlowTest extends TestCase
             ->assertDontSee('Solicitar préstamo');
     }
 
+    public function test_muestra_la_portada_del_libro_en_inicio_catalogo_y_detalle(): void
+    {
+        $libro = $this->crearLibro('El Principito');
+        $portada = asset('libros/principito.jpg');
+
+        $this->assertFileExists(public_path('libros/principito.jpg'));
+
+        foreach ([url('/'), route('catalogo.index'), route('catalogo.show', $libro)] as $url) {
+            $this->get($url)
+                ->assertOk()
+                ->assertSee('src="'.$portada.'"', false)
+                ->assertSee('alt="Portada de El Principito"', false);
+        }
+    }
+
     public function test_cliente_no_puede_iniciar_sesion_ni_consultar_prestamos(): void
     {
         User::factory()->create([

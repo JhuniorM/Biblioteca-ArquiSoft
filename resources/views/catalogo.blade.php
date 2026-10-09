@@ -82,7 +82,11 @@
                         @endphp
                         <article class="group min-w-0">
                             <div class="relative mb-4 aspect-[2/3] overflow-hidden rounded-[3px] bg-[#3c5c5b] shadow-[5px_8px_13px_rgba(50,37,27,0.22)] transition duration-300 group-hover:-translate-y-2 group-hover:shadow-[8px_14px_20px_rgba(50,37,27,0.28)]">
-                                <div role="img" aria-label="Portada de {{ $libro->titulo }}" class="flex h-full flex-col justify-between bg-gradient-to-br {{ $coverStyle }} p-4 text-white"><span class="text-[8px] uppercase tracking-[0.2em] text-white/75">Biblioteca ArquiSoft</span><span class="font-display text-4xl leading-none">{{ $initials }}</span><span><span class="block font-display text-lg leading-tight">{{ $libro->titulo }}</span><span class="mt-2 block text-[9px] text-white/80">{{ $libro->autor }}</span></span></div>
+                                @if ($libro->portada_url)
+                                    <img src="{{ $libro->portada_url }}" alt="Portada de {{ $libro->titulo }}" class="h-full w-full object-cover">
+                                @else
+                                    <div role="img" aria-label="Portada de {{ $libro->titulo }}" class="flex h-full flex-col justify-between bg-gradient-to-br {{ $coverStyle }} p-4 text-white"><span class="text-[8px] uppercase tracking-[0.2em] text-white/75">Biblioteca ArquiSoft</span><span class="font-display text-4xl leading-none">{{ $initials }}</span><span><span class="block font-display text-lg leading-tight">{{ $libro->titulo }}</span><span class="mt-2 block text-[9px] text-white/80">{{ $libro->autor }}</span></span></div>
+                                @endif
                                 <span class="absolute right-2 top-2 rounded-full bg-[#151311]/80 px-2 py-1 text-[9px] font-semibold text-white">{{ $disponibles > 0 ? 'Disponible' : 'Agotado' }}</span>
                             </div>
                             <span class="mb-2 inline-block text-[9px] font-semibold uppercase tracking-[0.12em] text-[#b09169]">{{ $libro->categoria?->nombre ?? 'Sin categor&iacute;a' }}</span>
